@@ -1,13 +1,47 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+from werkzeug.exceptions import HTTPException
 
 from database.learning_repository import init_db
 from routes.weather_routes import weather_bp
 from routes.learning_routes import learning_bp
+from flask import jsonify
 from view_helpers import render_home
 from log.logger_config import action_logger
+from log.logger_config import error_logger
 from routes.log_routes import log_bp
+from pathlib import Path
 app = Flask(__name__)
 
+@app.errorhandler(HTTPException)
+def handle_http_error(error):
+    """404, 400, 403, 405 등의 HTTP 오류 기록."""
+
+    error_logger.warning(
+        "HTTP 오류 | status=%s | path=%s | description=%s",
+        error.code,
+        request.path,
+        error.description
+    )
+
+    return jsonify({
+        "error": error.name,
+        "message": error.description
+    }), error.code
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(error):
+    """처리되지 않은 예외 기록."""
+
+    error_logger.exception(
+        "서버 내부 오류 | path=%s",
+        request.path
+    )
+
+    return jsonify({
+        "error": "Internal Server Error",
+        "message": "서버 내부 오류가 발생했습니다."
+    }), 500
 
 # 라우트 등록
 app.register_blueprint(weather_bp)
@@ -17,13 +51,20 @@ app.register_blueprint(log_bp)
 # 메인 페이지
 @app.route("/")
 def home():
-    return render_home()
+    response = render_home()
 
+    if response.status_code == 200:
+        print("HTTPStatus 200 - Fine")
 
-# if __name__ == "__main__":
-#     init_db()
-#     app.run(debug=True)
+    return response
+
 if __name__ == "__main__":
     init_db()
 
-    app.run(debug=True)
+    cert_path = Path(__file__).with_name("localhost.pem")
+    key_path = Path(__file__).with_name("localhost-key.pem")
+
+    app.run(
+        debug=True,
+        ssl_context=(str(cert_path), str(key_path))
+    )

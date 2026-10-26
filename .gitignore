@@ -6,3 +6,5 @@ venv/
 .env
 app/learning.db
 app/learning_backup.db
+app/localhost.pem
+app/localhost-key.pem
