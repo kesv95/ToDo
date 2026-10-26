@@ -1,0 +1,172 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px 15px;
+    font-family: Arial, "Malgun Gothic", sans-serif;
+    background: #f0f4f8;
+    color: #263238;
+    line-height: 1.6;
+}
+
+.container {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    color: #2463a6;
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #607080;
+}
+
+.card {
+    background: #ffffff;
+    width: 100%;
+    padding: 25px;
+    margin-bottom: 22px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+.card h2 {
+    margin-top: 0;
+    color: #2463a6;
+}
+
+label {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+input,
+select {
+    display: block;
+    width: 100%;
+    padding: 12px 40px 12px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+    font-size: 15px;
+    /* default cursor hide */
+    appearance: none;
+    -webkit-appearance: none;
+    /* img cursor */
+    background-image: url("app/img/img_under.jpg");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+input:focus,
+select:focus {
+    outline: 2px solid #80bfff;
+    border-color: #2463a6;
+}
+
+button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #2463a6;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #174778;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 10px;
+    background: #e8f4ff;
+    border-left: 4px solid #2463a6;
+}
+
+.result h3 {
+    margin-top: 0;
+    color: #174778;
+}
+
+.error {
+    margin-top: 15px;
+    color: #c62828;
+    font-weight: bold;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+}
+
+th,
+td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background: #e8f4ff;
+    color: #174778;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+footer {
+    text-align: center;
+    color: #607080;
+    padding: 10px;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 18px 10px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    header h1 {
+        font-size: 25px;
+    }
+
+    #area.placeholder {
+        color: #999;
+    }
+
+    #area option {
+        color: #333;
+    }
+}

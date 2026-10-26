@@ -1,0 +1,8 @@
+.idea/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+app/learning.db
+app/learning_backup.db
