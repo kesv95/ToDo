@@ -1,0 +1,28 @@
+<section class="card">
+    <h2>📊 나의 학습진단 기록</h2>
+
+    {% if records %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>진단 날짜</th>
+                    <th>점수</th>
+                    <th>진단 결과</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record["created_at"] }}</td>
+                    <td>{{ record["score"] }} / 12</td>
+                    <td>{{ record["diagnosis"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>아직 저장된 학습진단 기록이 없습니다.</p>
+    {% endif %}
+</section>

@@ -1,0 +1,60 @@
+<section class="card">
+    <h2>📚 학습 습관 진단</h2>
+
+    <form action="/diagnose" method="post">
+        <label for="category">1. 공부 분야</label>
+        <select id="category" name="category" required>
+            <option value="" selected disabled>
+                이 곳을 클릭하여 값을 선택해주세요.
+            </option>
+            <option value="1">파이썬</option>
+            <option value="2">네트워크</option>
+            <option value="3">SW</option>
+            <option value="4">AI</option>
+            <option value="5">보안</option>
+        </select>
+
+        <label for="study">2. 하루 공부 시간</label>
+        <select id="study" name="study" required>
+            <option value="" selected disabled>
+                이 곳을 클릭하여 값을 선택해주세요.
+            </option>
+            <option value="1">30분 미만</option>
+            <option value="2">30분~1시간</option>
+            <option value="3">1~2시간</option>
+            <option value="4">2시간 이상</option>
+        </select>
+
+        <label for="plan">3. 공부 계획 실천 정도</label>
+        <select id="plan" name="plan" required>
+            <option value="" selected disabled>
+                이 곳을 클릭하여 값을 선택해주세요.
+            </option>
+            <option value="1">거의 지키지 못함</option>
+            <option value="2">가끔 지킴</option>
+            <option value="3">대부분 지킴</option>
+            <option value="4">항상 잘 지킴</option>
+        </select>
+
+        <label for="review">4. 복습 습관</label>
+        <select id="review" name="review" required>
+            <option value="" selected disabled>
+                이 곳을 클릭하여 값을 선택해주세요.
+            </option>
+            <option value="1">거의 복습하지 않음</option>
+            <option value="2">시험 전에만 복습</option>
+            <option value="3">가끔 복습함</option>
+            <option value="4">꾸준히 복습함</option>
+        </select>
+
+        <button type="submit">학습 결과 확인</button>
+    </form>
+
+    {% if diagnosis %}
+    <div class="result">
+        <h3>진단 결과: {{ score }}점 / 12점</h3>
+        <p>{{ diagnosis }}</p>
+        <p><strong>학습 조언:</strong> {{ advice }}</p>
+    </div>
+    {% endif %}
+</section>

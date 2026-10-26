@@ -10,161 +10,59 @@
 <body>
 <main class="container">
     <header>
-        <h1>📘 학습진단 & 날씨</h1>
+        <div class="header-top">
+            <h1>📘 학습진단 & 날씨</h1>
+            <button type="button" id="aboutButton">
+                자기소개
+            </button>
+        </div>
+
         <p>나의 학습 습관을 확인하고 오늘의 날씨도 알아보세요.</p>
     </header>
 
-    <!-- 학습진단 -->
-    <section class="card">
-        <h2>📚 학습 습관 진단</h2>
-
-        <form action="/diagnose" method="post">
-            <label for="category">1. 공부 분야</label>
-            <select id="category" name="category" required>
-                <option value="" selected disabled>
-                이 곳을 클릭하여 값을 선택해주세요.
-                </option>
-                <option value="1">파이썬</option>
-                <option value="2">네트워크</option>
-                <option value="3">SW</option>
-                <option value="4">AI</option>
-                <option value="5">보안</option>
-            </select>
-
-            <label for="study">2. 하루 공부 시간</label>
-            <select id="study" name="study" required>
-                <option value="" selected disabled>
-                이 곳을 클릭하여 값을 선택해주세요.
-                </option>
-                <option value="1">30분 미만</option>
-                <option value="2">30분~1시간</option>
-                <option value="3">1~2시간</option>
-                <option value="4">2시간 이상</option>
-            </select>
-
-            <label for="plan">3. 공부 계획 실천 정도</label>
-            <select id="plan" name="plan" required>
-                <option value="" selected disabled>
-                이 곳을 클릭하여 값을 선택해주세요.
-                </option>
-                <option value="1">거의 지키지 못함</option>
-                <option value="2">가끔 지킴</option>
-                <option value="3">대부분 지킴</option>
-                <option value="4">항상 잘 지킴</option>
-            </select>
-
-            <label for="review">4. 복습 습관</label>
-            <select id="review" name="review" required>
-                <option value="" selected disabled>
-                이 곳을 클릭하여 값을 선택해주세요.
-                </option>
-                <option value="1">거의 복습하지 않음</option>
-                <option value="2">시험 전에만 복습</option>
-                <option value="3">가끔 복습함</option>
-                <option value="4">꾸준히 복습함</option>
-            </select>
-
-            <button type="submit">학습 결과 확인</button>
-        </form>
-
-        {% if diagnosis %}
-        <div class="result">
-            <h3>진단 결과: {{ score }}점 / 12점</h3>
-            <p>{{ diagnosis }}</p>
-            <p><strong>학습 조언:</strong> {{ advice }}</p>
+    <!-- 자기소개 모달 -->
+    <div id="aboutModal" class="about-modal">
+        <div id="aboutContent" class="about-content">
+            <iframe
+                    src="/about"
+                    title="자기소개"
+                    class="about-iframe">
+            </iframe>
         </div>
-        {% endif %}
-    </section>
+    </div>
 
-    <!-- DB에 저장된 학습진단 기록 -->
-    <section class="card">
-        <h2>📊 나의 학습진단 기록</h2>
+    {% include 'components/learning.html' %}
 
-        {% if records %}
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                <tr>
-                    <th>진단 날짜</th>
-                    <th>점수</th>
-                    <th>진단 결과</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for record in records %}
-                <tr>
-                    <td>{{ record["created_at"] }}</td>
-                    <td>{{ record["score"] }} / 12</td>
-                    <td>{{ record["diagnosis"] }}</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <p>아직 저장된 학습진단 기록이 없습니다.</p>
-        {% endif %}
-    </section>
+    {% include 'components/learning_records.html' %}
 
-    <!-- 날씨 조회 -->
-    <section class="card">
-        <h2>🌤️ 현재 날씨 조회</h2>
-
-        <form action="/weather" method="post">
-            <label for="city">도시 이름</label>
-
-            <select id="city" name="city">
-                <option value="" selected disabled>도시를 선택해 주세요</option>
-                <option value="Gangwon">강원</option>
-                <option value="Seoul">서울</option>
-                <option value="Gyeonggi">경기</option>
-                <option value="Sejong">세종</option>
-                <option value="Daejeon">대전</option>
-                <option value="Jeolla">전라</option>
-                <option value="Gyeongsang">경상</option>
-                <option value="Busan">부산</option>
-                <option value="Jeju">제주</option>
-                <option value="Hokkaido">홋카이도</option>
-                <option value="Tokyo">도쿄</option>
-                <option value="Nagoya">나고야</option>
-                <option value="Osaka">오사카</option>
-                <option value="Washington">워싱턴</option>
-                <option value="New York">뉴욕</option>
-                <option value="Chicago">시카고</option>
-                <option value="Texas">텍사스</option>
-                <option value="Edinburgh">에든버러</option>
-                <option value="London">런던</option>
-                <option value="Manchester">맨체스터</option>
-                <option value="Paris">파리</option>
-                <option value="Nice">니스</option>
-                <option value="Marseille">마르세유</option>
-            </select>
-            <button type="submit">날씨 확인</button>
-        </form>
-
-        {% if weather %}
-        <div class="result">
-            <h3>{{ city }}의 현재 날씨</h3>
-            <p>🌡️ 기온: {{ weather.temperature }}°C</p>
-            <p>💧 습도: {{ weather.humidity }}%</p>
-            <p>☁️ 날씨: {{ weather.description }}</p>
-            <p>💨 풍속: {{ weather.wind }} km/h</p>
-        </div>
-        {% endif %}
-
-        {% if error %}
-        <p class="error">{{ error }}</p>
-        {% endif %}
-    </section>
+    {% include 'components/weather.html' %}
 
     <footer>
         <p>오늘도 꾸준히 공부해 봐요! 🌱</p>
     </footer>
 </main>
+
 <script
-    defer
-    src="{{ url_for('static', filename='script/appcontrol.js') }}"
-    data-log-url="{{ url_for('log.save_action_log') }}">
+        defer
+        src="{{ url_for('static', filename='script/appcontrol.js') }}"
+        data-log-url="{{ url_for('log.save_action_log') }}">
+</script>
+<script>
+    const aboutButton = document.getElementById("aboutButton");
+    const aboutModal = document.getElementById("aboutModal");
+    const aboutContent = document.getElementById("aboutContent");
+
+    // 자기소개 버튼 클릭 시 표시
+    aboutButton.addEventListener("click", function () {
+        aboutModal.classList.add("active");
+    });
+
+    // 자기소개 화면 바깥을 클릭하면 닫기
+    aboutModal.addEventListener("click", function (event) {
+        if (!aboutContent.contains(event.target)) {
+            aboutModal.classList.remove("active");
+        }
+    });
 </script>
 </body>
 </html>
