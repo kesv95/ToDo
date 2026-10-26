@@ -1,20 +1,22 @@
+
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import HTTPException
+from pathlib import Path
 
 from database.learning_repository import init_db
 from routes.weather_routes import weather_bp
 from routes.learning_routes import learning_bp
-from flask import jsonify
-from view_helpers import render_home
-from log.logger_config import action_logger
-from log.logger_config import error_logger
 from routes.log_routes import log_bp
-from pathlib import Path
+from view_helpers import render_home
+from log.logger_config import error_logger
+
 app = Flask(__name__)
 
+
+# HTTP 오류 처리: 404, 400, 403, 405 등
 @app.errorhandler(HTTPException)
 def handle_http_error(error):
-    """404, 400, 403, 405 등의 HTTP 오류 기록."""
+    """HTTP 오류를 로그 파일에 기록한다."""
 
     error_logger.warning(
         "HTTP 오류 | status=%s | path=%s | description=%s",
@@ -23,15 +25,14 @@ def handle_http_error(error):
         error.description
     )
 
-    return jsonify({
-        "error": error.name,
-        "message": error.description
-    }), error.code
+    # Flask의 원래 HTTP 오류 응답을 유지한다.
+    return error
 
 
+# 예상하지 못한 서버 내부 오류 처리
 @app.errorhandler(Exception)
 def handle_unexpected_error(error):
-    """처리되지 않은 예외 기록."""
+    """처리되지 않은 예외를 로그 파일에 기록한다."""
 
     error_logger.exception(
         "서버 내부 오류 | path=%s",
@@ -43,21 +44,28 @@ def handle_unexpected_error(error):
         "message": "서버 내부 오류가 발생했습니다."
     }), 500
 
-# 라우트 등록
+
+# 블루프린트 등록
 app.register_blueprint(weather_bp)
 app.register_blueprint(learning_bp)
 app.register_blueprint(log_bp)
 
+
 # 메인 페이지
 @app.route("/")
 def home():
-    response = render_home()
+    return render_home()
 
-    if response.status_code == 200:
-        print("HTTPStatus 200 - Fine")
+
+@app.after_request
+def log_response_status(response):
+    if response.status_code == 200 and request.path == "/":
+        print("HTTPStatus 200")
 
     return response
 
+
+# 서버 실행
 if __name__ == "__main__":
     init_db()
 
