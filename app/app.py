@@ -1,5 +1,4 @@
-
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from werkzeug.exceptions import HTTPException
 from pathlib import Path
 
@@ -64,6 +63,10 @@ def log_response_status(response):
 
     return response
 
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 # 서버 실행
 if __name__ == "__main__":
