@@ -6,7 +6,6 @@
     <title>학습진단과 날씨</title>
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
-    <script src="../script/appcontrol.js"></script>
 </head>
 <body>
 <main class="container">
@@ -114,7 +113,7 @@
         <form action="/weather" method="post">
             <label for="city">도시 이름</label>
 
-            <select id="city" name="city" required>
+            <select id="city" name="city">
                 <option value="" selected disabled>도시를 선택해 주세요</option>
                 <option value="Gangwon">강원</option>
                 <option value="Seoul">서울</option>
@@ -162,5 +161,10 @@
         <p>오늘도 꾸준히 공부해 봐요! 🌱</p>
     </footer>
 </main>
+<script
+    defer
+    src="{{ url_for('static', filename='script/appcontrol.js') }}"
+    data-log-url="{{ url_for('log.save_action_log') }}">
+</script>
 </body>
 </html>
