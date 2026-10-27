@@ -1,3 +1,4 @@
+
 from flask import (
     Blueprint, request, redirect, url_for, session
 )
@@ -15,13 +16,7 @@ def diagnose():
 
     user = session.get("user")
 
-    # 비회원은 진단 결과를 1회만 저장할 수 있다.
-    if not (user and user.get("id")):
-        guest_records = session.get("guest_records", [])
-
-        if guest_records:
-            return redirect(url_for("home", guest_limit=1))
-
+    # 먼저 입력값 검증
     try:
         category = int(request.form["category"])
         study = int(request.form["study"])
@@ -40,6 +35,22 @@ def diagnose():
     except (ValueError, KeyError):
         return "올바른 학습 정보를 입력해 주세요.", 400
 
+    # 비회원이 이미 첫 번째 진단을 완료했다면
+    # 두 번째 선택값을 세션에 임시 보관하고 로그인 안내 표시
+    if not (user and user.get("id")):
+        guest_records = session.get("guest_records", [])
+
+        if guest_records:
+            session["pending_diagnosis"] = {
+                "category": category,
+                "study": study,
+                "plan": plan,
+                "review": review
+            }
+
+            return redirect(url_for("home", guest_limit=1))
+
+    # 진단 실행
     score, diagnosis, advice = diagnose_learning(
         study=study,
         plan=plan,
@@ -73,7 +84,7 @@ def diagnose():
             created_at=created_at
         )
     else:
-        # 비회원: 세션에 결과 1개만 저장
+        # 비회원: 첫 번째 진단 결과를 세션에 저장
         session["guest_records"] = [record]
         session.permanent = True
 
