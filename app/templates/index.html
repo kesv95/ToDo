@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>학습진단과 날씨</title>
+
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -12,9 +13,28 @@
     <header>
         <div class="header-top">
             <h1>📘 학습진단 & 날씨</h1>
-            <button type="button" id="aboutButton">
-                자기소개
-            </button>
+
+            <div class="header-buttons">
+                {% if user %}
+                    <span class="user-name">
+                        {{ user.name }}님
+                    </span>
+
+                    <a href="{{ url_for('auth.logout') }}"
+                       class="login-button">
+                        로그아웃
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.google_login') }}"
+                       class="login-button">
+                        Google 로그인
+                    </a>
+                {% endif %}
+
+                <button type="button" id="aboutButton">
+                    자기소개
+                </button>
+            </div>
         </div>
 
         <p>나의 학습 습관을 확인하고 오늘의 날씨도 알아보세요.</p>
@@ -24,18 +44,24 @@
     <div id="aboutModal" class="about-modal">
         <div id="aboutContent" class="about-content">
             <iframe
-                    src="/about"
-                    title="자기소개"
-                    class="about-iframe">
+                src="{{ url_for('about') }}"
+                title="자기소개"
+                class="about-iframe">
             </iframe>
         </div>
     </div>
 
+    <!-- 학습 진단 -->
     {% include 'components/learning.html' %}
 
+    <!-- 학습 기록 -->
     {% include 'components/learning_records.html' %}
 
+    <!-- 날씨 -->
     {% include 'components/weather.html' %}
+
+    <!-- 비회원 이용 제한 모달 -->
+    {% include 'guest_limit_modal.html' %}
 
     <footer>
         <p>오늘도 꾸준히 공부해 봐요! 🌱</p>
@@ -43,21 +69,22 @@
 </main>
 
 <script
-        defer
-        src="{{ url_for('static', filename='script/appcontrol.js') }}"
-        data-log-url="{{ url_for('log.save_action_log') }}">
+    defer
+    src="{{ url_for('static', filename='script/appcontrol.js') }}"
+    data-log-url="{{ url_for('log.save_action_log') }}">
 </script>
+
 <script>
     const aboutButton = document.getElementById("aboutButton");
     const aboutModal = document.getElementById("aboutModal");
     const aboutContent = document.getElementById("aboutContent");
 
-    // 자기소개 버튼 클릭 시 표시
+    // 자기소개 버튼 클릭 시 모달 표시
     aboutButton.addEventListener("click", function () {
         aboutModal.classList.add("active");
     });
 
-    // 자기소개 화면 바깥을 클릭하면 닫기
+    // 모달 바깥쪽을 클릭하면 닫기
     aboutModal.addEventListener("click", function (event) {
         if (!aboutContent.contains(event.target)) {
             aboutModal.classList.remove("active");
