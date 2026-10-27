@@ -1,12 +1,21 @@
+
+import os
 import sqlite3
 from pathlib import Path
 
 
-# DB 파일 경로
-DB_PATH = Path(__file__).resolve().parent.parent / "learning.db"
+# Vercel에서는 쓰기 가능한 임시 폴더를 사용하고,
+# 로컬에서는 기존 데이터베이스 경로를 유지한다.
+if os.getenv("VERCEL") == "1":
+    DB_PATH = Path("/tmp/learning.db")
+else:
+    DB_PATH = Path(__file__).resolve().parent.parent / "learning.db"
 
 
 def get_db():
+    # 데이터베이스 폴더가 없으면 생성한다.
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
@@ -14,8 +23,8 @@ def get_db():
 
 
 def init_db():
+    """필요한 데이터베이스 테이블과 인덱스를 생성한다."""
     with get_db() as conn:
-        # 1. 사용자 테이블 생성
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id TEXT PRIMARY KEY,
@@ -25,7 +34,6 @@ def init_db():
             )
         """)
 
-        # 2. 기존 학습 기록 테이블 생성
         conn.execute("""
             CREATE TABLE IF NOT EXISTS learning_records (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,7 +48,6 @@ def init_db():
             )
         """)
 
-        # 3. 기존 테이블에 user_id 컬럼이 있는지 확인
         columns = {
             row["name"]
             for row in conn.execute(
@@ -48,14 +55,12 @@ def init_db():
             ).fetchall()
         }
 
-        # 4. user_id 컬럼이 없을 때만 추가
         if "user_id" not in columns:
             conn.execute("""
                 ALTER TABLE learning_records
                 ADD COLUMN user_id TEXT REFERENCES users(id)
             """)
 
-        # 5. 사용자별 학습 기록 조회를 위한 인덱스 생성
         conn.execute("""
             CREATE INDEX IF NOT EXISTS
             idx_learning_records_user_id_id
@@ -64,8 +69,7 @@ def init_db():
 
 
 def save_user(user_id, name, email):
-    """Google 계정 정보를 등록하거나 최신 정보로 갱신한다."""
-
+    """Google 계정 정보를 등록하거나 갱신한다."""
     with get_db() as conn:
         conn.execute("""
             INSERT INTO users (id, name, email)
@@ -77,8 +81,7 @@ def save_user(user_id, name, email):
 
 
 def get_records(user_id, limit=10):
-    """특정 사용자의 학습진단 기록만 최신순으로 조회한다."""
-
+    """특정 사용자의 학습진단 기록을 최신순으로 조회한다."""
     if not user_id:
         return []
 
@@ -103,8 +106,7 @@ def save_record(
     advice,
     created_at
 ):
-    """학습진단 결과를 해당 사용자에게 연결하여 저장한다."""
-
+    """학습진단 결과를 사용자에게 연결하여 저장한다."""
     if not user_id:
         raise ValueError("로그인한 사용자 ID가 필요합니다.")
 
@@ -133,3 +135,7 @@ def save_record(
             advice,
             created_at
         ))
+
+
+# Vercel은 앱을 가져올 때 테이블이 준비되도록 초기화한다.
+init_db()
