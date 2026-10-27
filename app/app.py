@@ -1,10 +1,15 @@
 
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
+
+# 프로젝트 루트의 .env 파일 읽기
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(PROJECT_ROOT / ".env")
 
 from flask import Flask, request, jsonify, render_template
 from werkzeug.exceptions import HTTPException
-from pathlib import Path
 
 from database.learning_repository import init_db
 from routes.weather_routes import weather_bp
@@ -14,10 +19,6 @@ from routes.auth_routes import auth_bp
 from view_helpers import render_home
 from log.logger_config import error_logger
 from extensions import oauth
-
-
-# 프로젝트 루트의 .env 파일 읽기
-load_dotenv()
 
 
 # Flask 앱 생성
@@ -49,11 +50,14 @@ oauth.register(
 )
 
 
-# HTTP 오류 처리: 404, 400, 403, 405 등
+# Neon PostgreSQL 데이터베이스 초기화
+init_db()
+
+
+# HTTP 오류 처리
 @app.errorhandler(HTTPException)
 def handle_http_error(error):
-    """HTTP 오류를 로그 파일에 기록한다."""
-
+    """HTTP 오류를 로그에 기록한다."""
     error_logger.warning(
         "HTTP 오류 | status=%s | path=%s | description=%s",
         error.code,
@@ -61,15 +65,13 @@ def handle_http_error(error):
         error.description
     )
 
-    # Flask의 원래 HTTP 오류 응답을 유지한다.
     return error
 
 
 # 예상하지 못한 서버 내부 오류 처리
 @app.errorhandler(Exception)
 def handle_unexpected_error(error):
-    """처리되지 않은 예외를 로그 파일에 기록한다."""
-
+    """처리되지 않은 예외를 로그에 기록한다."""
     error_logger.exception(
         "서버 내부 오류 | path=%s",
         request.path
@@ -106,10 +108,8 @@ def about():
     return render_template("about.html")
 
 
-# 서버 실행
+# 로컬 서버 실행
 if __name__ == "__main__":
-    init_db()
-
     cert_path = Path(__file__).with_name("localhost.pem")
     key_path = Path(__file__).with_name("localhost-key.pem")
 
